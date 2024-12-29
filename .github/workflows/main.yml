@@ -27,5 +27,5 @@ jobs:
       - name: Run Code Review
         run: |
           cd openai-code-review-sdk/src/main/java
-          javac plus.gaga.middleware.sdk.OpenAiCodeReview.java
+          javac plus/gaga/middleware/sdk/OpenAiCodeReview.java
           java plus.gaga.middleware.sdk.OpenAiCodeReview
