@@ -1,6 +1,8 @@
 package plus.gaga.middleware.sdk;
 
 
+import plus.gaga.middleware.sdk.type.utils.CodeReview;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
@@ -25,7 +27,10 @@ public class OpenAiCodeReview {
         }
         int exitCode = process.waitFor();
         System.out.println("Exited with code: " + exitCode);
-        System.out.println("评审代码" + diffCode);
+        System.out.println("待评审代码" + diffCode);
+        String log = CodeReview.codeReview(diffCode.toString());
+        System.out.println("评审结果：\n" + log);
+
     }
 
 }
