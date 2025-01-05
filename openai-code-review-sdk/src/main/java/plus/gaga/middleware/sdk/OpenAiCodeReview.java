@@ -30,7 +30,6 @@ public class OpenAiCodeReview {
         System.out.println("待评审代码" + diffCode);
         String log = CodeReview.codeReview(diffCode.toString());
         System.out.println("评审结果：\n" + log);
-
     }
 
 }
