@@ -6,4 +6,4 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
-../docs/
+../docs/curl/curl-glm-4.ps1
