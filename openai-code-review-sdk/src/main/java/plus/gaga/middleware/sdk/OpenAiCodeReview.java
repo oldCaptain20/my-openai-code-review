@@ -4,23 +4,27 @@ package plus.gaga.middleware.sdk;
 import com.alibaba.fastjson2.JSON;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.util.StringUtils;
 import plus.gaga.middleware.sdk.domain.model.Model;
 import plus.gaga.middleware.sdk.infrustracture.openai.dto.ChatCompletionRequestDTO;
 import plus.gaga.middleware.sdk.infrustracture.openai.dto.ChatCompletionSyncResponseDTO;
 import plus.gaga.middleware.sdk.type.utils.BearerTokenUtils;
+import plus.gaga.middleware.sdk.type.utils.RandomUtil;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class OpenAiCodeReview {
 
     public static void main(String[] args) throws Exception {
         System.out.println("\"测试执行\" === " + "测试执行");
+
+        String githubToken = System.getenv("GITHUB_TOKEN");
+
 
         // 代码检出
         ProcessBuilder processBuilder = new ProcessBuilder("git", "diff", "HEAD~1", "HEAD");
@@ -40,19 +44,22 @@ public class OpenAiCodeReview {
         System.out.println("待评审代码\n" + diffCode);
         String log = codeReview(diffCode.toString());
         System.out.println("评审结果：\n" + log);
+
+        // 写入日志库
+        writeLog(log, githubToken);
+
     }
 
     /**
      * 代码审查
      *
      * @param diffCode 需要审查的代码
-     * @return 返回建议说明，字符串形式
+     * @return 返回建议说明，字符串形式 log日志
      * @throws IOException
      */
-    public static String codeReview(String diffCode) throws IOException {
+    public static String codeReview(String diffCode) throws Exception {
         String apiKeySecret = "a1a614d1edbd471b84536b4626e4615b.DofbLZQYkFOfrBtM";
         String token = BearerTokenUtils.getToken(apiKeySecret);
-
         // 代码调用
         URL url = new URL("https://open.bigmodel.cn/api/paas/v4/chat/completions");
         HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -111,33 +118,51 @@ public class OpenAiCodeReview {
         System.out.println("content = " + content);
 
         ChatCompletionSyncResponseDTO responseDTO = JSON.parseObject(content.toString(), ChatCompletionSyncResponseDTO.class);
+        // 解析实体类 返回数据
         String log = responseDTO.getChoices().get(0).getMessage().getContent();
         System.out.println(log);
         return log;
 
     }
 
-    public static boolean writeLog(String log) throws Exception {
-        String githubToken = "";
+    /**
+     * 写入日志库
+     *
+     * @param log         评审日志
+     * @param githubToken 仓库的钥匙
+     * @return 地址url
+     * @throws Exception
+     */
+    public static String writeLog(String log, String githubToken) throws Exception {
+        if (StringUtils.isEmptyOrNull(githubToken)) {
+            throw new RuntimeException("Github token 不能为空");
+        }
         String password = "";
         String repository = "repo";
 
-        Git repo = Git.cloneRepository()
-                .setURI("https://github.com/oldCaptain20/my-openai-code-review-log.git")
+        Git git = Git.cloneRepository().setURI("https://github.com/oldCaptain20/my-openai-code-review-log.git")
                 // 创建一个文件夹，克隆操作会把仓库的代码下载到repo文件夹中
                 .setDirectory(new File(repository))
                 // GitHub 仓库需要身份验证(例如私人仓库)
-                .setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, password))
-                .call();
+                .setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, password)).call();
 
-        String fileName = LocalDate.now().toString();
-        File file = new File(repository + "/" + fileName);
+        String dateFolderName = LocalDate.now().toString();
+        File file = new File(repository + "/" + dateFolderName);
         if (!file.exists()) {
             file.mkdirs();
         }
-
-
-        return true;
+        String fileName = RandomUtil.generateRandomString(12) + ".md";
+        File newLogFile = new File(dateFolderName, fileName);
+        // 将字符数据写入文件，将log写入到newLogFile.md 文件中
+        try (FileWriter fileWriter = new FileWriter(newLogFile)) {
+            fileWriter.write(log);
+        }
+        // 然后将文件提交到指定的文件夹下
+        git.add().addFilepattern(dateFolderName + "/" + fileName).call();
+        git.commit().setMessage("Add new file").call();
+        git.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, ""));
+        String whatFolder = "/blob/master/";
+        return "https://github.com/oldCaptain20/my-openai-code-review-log" + whatFolder + dateFolderName + "/" + fileName;
     }
 
 
