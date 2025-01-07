@@ -121,6 +121,7 @@ public class OpenAiCodeReview {
      * @throws Exception
      */
     public static String writeLog(String log, String githubToken) throws Exception {
+        String whatFolder = "/blob/master/";
         if (StringUtils.isEmptyOrNull(githubToken)) {
             throw new RuntimeException("Github token 不能为空");
         }
@@ -139,7 +140,7 @@ public class OpenAiCodeReview {
             file.mkdirs();
         }
         String fileName = RandomUtil.generateRandomString(12) + ".md";
-        File newLogFile = new File(dateFolderName, fileName);
+        File newLogFile = new File("https://github.com/oldCaptain20/my-openai-code-review-log" + whatFolder +dateFolderName, fileName);
         // 将字符数据写入文件，将log写入到newLogFile.md 文件中
         try (FileWriter fileWriter = new FileWriter(newLogFile)) {
             fileWriter.write(log);
@@ -148,7 +149,6 @@ public class OpenAiCodeReview {
         git.add().addFilepattern(dateFolderName + "/" + fileName).call();
         git.commit().setMessage("Add new file").call();
         git.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, ""));
-        String whatFolder = "/blob/master/";
         return "https://github.com/oldCaptain20/my-openai-code-review-log" + whatFolder + dateFolderName + "/" + fileName;
     }
 
