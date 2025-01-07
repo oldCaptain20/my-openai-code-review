@@ -45,7 +45,8 @@ public class OpenAiCodeReview {
         System.out.println("评审结果：\n" + log);
 
         // 写入日志库
-        writeLog(log, githubToken);
+        String writeLog = writeLog(log, githubToken);
+        System.out.println("写入日志库URL\n" + writeLog);
 
     }
 
