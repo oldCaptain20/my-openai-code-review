@@ -135,18 +135,18 @@ public class OpenAiCodeReview {
                 .setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, password)).call();
 
         String dateFolderName = LocalDate.now().toString();
-        File file = new File(repository + "/" + dateFolderName);
-        if (!file.exists()) {
-            file.mkdirs();
+        File directory = new File(repository + "/" + dateFolderName);
+        if (!directory.exists()) {
+            directory.mkdirs();
         }
         String fileName = RandomUtil.generateRandomString(12) + ".md";
-        File newLogFile = new File("https://github.com/oldCaptain20/my-openai-code-review-log" + whatFolder +dateFolderName, fileName);
+        File newLogFile = new File(directory, fileName);
         // 将字符数据写入文件，将log写入到newLogFile.md 文件中
         try (FileWriter fileWriter = new FileWriter(newLogFile)) {
             fileWriter.write(log);
         }
         // 然后将文件提交到指定的文件夹下
-        git.add().addFilepattern(dateFolderName + "/" + fileName).call();
+        git.add().addFilepattern(directory + "/" + fileName).call();
         git.commit().setMessage("Add new file").call();
         git.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, ""));
         return "https://github.com/oldCaptain20/my-openai-code-review-log" + whatFolder + dateFolderName + "/" + fileName;
