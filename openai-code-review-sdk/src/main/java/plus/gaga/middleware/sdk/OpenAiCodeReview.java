@@ -146,7 +146,7 @@ public class OpenAiCodeReview {
             fileWriter.write(log);
         }
         // 然后将文件提交到指定的文件夹下
-        git.add().addFilepattern(logDirectory + "/" + logFileName).call();
+        git.add().addFilepattern(date + "/" + logFileName).call();
         git.commit().setMessage("Add new file").call();
         git.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, ""));
         return "https://github.com/oldCaptain20/my-openai-code-review-log" + whatFolder + logDirectory + "/" + logFileName;
