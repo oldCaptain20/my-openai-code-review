@@ -149,7 +149,10 @@ public class OpenAiCodeReview {
         git.add().addFilepattern(date + "/" + logFileName).call();
         git.commit().setMessage("Add new file").call();
         git.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, ""));
-        return "https://github.com/oldCaptain20/my-openai-code-review-log" +"/"+ logDirectory + "/" + logFileName;
+        System.out.println("git.status().call() = " + git.status().call());
+        System.out.println("git.log().call() = " + git.log().call());
+
+        return "https://github.com/oldCaptain20/my-openai-code-review-log/" + logDirectory + "/" + logFileName;
     }
 
 }
