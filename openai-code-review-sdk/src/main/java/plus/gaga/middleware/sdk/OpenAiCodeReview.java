@@ -25,7 +25,6 @@ public class OpenAiCodeReview {
 
         String githubToken = System.getenv("GITHUB_TOKEN");
 
-
         // 代码检出
         ProcessBuilder processBuilder = new ProcessBuilder("git", "diff", "HEAD~1", "HEAD");
         // 执行命令时的工作目录。new File(".") 表示当前目录
@@ -69,18 +68,6 @@ public class OpenAiCodeReview {
         httpURLConnection.setRequestProperty("Content-Type", "application/json");
         httpURLConnection.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
         httpURLConnection.setDoOutput(true);
-
-/*        String jsonInputString = "{" +
-                "  \"model\": \"glm-4-flash\"," +
-                "  \"messages\": [" +
-                "    {" +
-                "      \"role\": \"user\"," +
-                "      \"content\": \"你是一个高级java开发工程师，精通各类场景方案、架构设计和设计模式，性能优化请您根据git diff记录，对代码做出评审。代码为: " +
-                "农夫过河的问题" + "\"" +
-                "    }" +
-                "  ]" +
-                "}";
-        */
 
         // 传递参数
         ChatCompletionRequestDTO chatCompletionRequest = new ChatCompletionRequestDTO();
