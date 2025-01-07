@@ -152,5 +152,4 @@ public class OpenAiCodeReview {
         return "https://github.com/oldCaptain20/my-openai-code-review-log" + whatFolder + logDirectory + "/" + logFileName;
     }
 
-
 }
