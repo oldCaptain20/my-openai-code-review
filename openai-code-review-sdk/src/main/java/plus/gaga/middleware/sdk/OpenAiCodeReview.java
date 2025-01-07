@@ -3,6 +3,8 @@ package plus.gaga.middleware.sdk;
 
 import com.alibaba.fastjson2.JSON;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.Status;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.util.StringUtils;
 import plus.gaga.middleware.sdk.domain.model.Model;
@@ -149,8 +151,22 @@ public class OpenAiCodeReview {
         git.add().addFilepattern(date + "/" + logFileName).call();
         git.commit().setMessage("Add new file").call();
         git.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, ""));
-        System.out.println("git.status().call() = " + git.status().call());
-        System.out.println("git.log().call() = " + git.log().call());
+        // 获取并打印工作区的状态
+        Status status = git.status().call();
+        System.out.println("Modified: " + status.getModified());
+        System.out.println("Added: " + status.getAdded());
+        System.out.println("Removed: " + status.getRemoved());
+        System.out.println("Untracked: " + status.getUntracked());
+
+        // 获取并打印提交历史
+        Iterable<RevCommit> debugLog = git.log().call();
+        for (RevCommit commit : debugLog) {
+            System.out.println("Commit: " + commit.getName());
+            System.out.println("Author: " + commit.getAuthorIdent().getName());
+            System.out.println("Date: " + commit.getAuthorIdent().getWhen());
+            System.out.println("Message: " + commit.getFullMessage());
+            System.out.println("------");
+        }
 
         return "https://github.com/oldCaptain20/my-openai-code-review-log/" + logDirectory + "/" + logFileName;
     }
