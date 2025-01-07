@@ -122,12 +122,11 @@ public class OpenAiCodeReview {
      * @throws Exception
      */
     public static String writeLog(String log, String githubToken) throws Exception {
-        String whatFolder = "/blob/master/";
         if (StringUtils.isEmptyOrNull(githubToken)) {
             throw new RuntimeException("Github token 不能为空");
         }
         String password = "";
-        String repository = "repo/";
+        String repository = "repo";
 
         Git git = Git.cloneRepository().setURI("https://github.com/oldCaptain20/my-openai-code-review-log.git")
                 // 创建一个文件夹，克隆操作会把仓库的代码下载到repo文件夹中
@@ -136,7 +135,7 @@ public class OpenAiCodeReview {
                 .setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, password)).call();
 
         String date = LocalDate.now().toString();
-        File logDirectory = new File(repository +  date);
+        File logDirectory = new File(repository + "/" + date);
         if (!logDirectory.exists()) {
             logDirectory.mkdirs();
         }
@@ -150,7 +149,7 @@ public class OpenAiCodeReview {
         git.add().addFilepattern(date + "/" + logFileName).call();
         git.commit().setMessage("Add new file").call();
         git.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, ""));
-        return "https://github.com/oldCaptain20/my-openai-code-review-log" + whatFolder + logDirectory + "/" + logFileName;
+        return "https://github.com/oldCaptain20/my-openai-code-review-log" + logDirectory + "/" + logFileName;
     }
 
 }
