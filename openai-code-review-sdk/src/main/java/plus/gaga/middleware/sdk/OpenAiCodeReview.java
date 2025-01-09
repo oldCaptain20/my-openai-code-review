@@ -129,25 +129,25 @@ public class OpenAiCodeReview {
         if (StringUtils.isEmptyOrNull(githubToken)) {
             throw new RuntimeException("Github token 不能为空");
         }
-
+        System.out.println("获取的token是：" + githubToken);
         Git git = Git.cloneRepository()
                 .setURI("https://github.com/oldCaptain20/my-openai-code-review-log.git")
                 .setDirectory(new File("repo"))
                 .setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, ""))
                 .call();
-
+        System.out.println("克隆代码");
         String dateFolderName = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         File dateFolder = new File("repo/" + dateFolderName);
         if (!dateFolder.exists()) {
             dateFolder.mkdirs();
         }
-
+        System.out.println("创建文件夹 " + dateFolder.exists());
         String fileName = RandomUtil.generateRandomString(12) + ".md";
         File newFile = new File(dateFolder, fileName);
         try (FileWriter writer = new FileWriter(newFile)) {
             writer.write(log);
         }
-
+        System.out.println("写入文件 " + newFile.getAbsoluteFile().length());
         git.add().addFilepattern(dateFolderName + "/" + fileName).call();
         git.commit().setMessage("Add new file").call();
         git.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, ""));
