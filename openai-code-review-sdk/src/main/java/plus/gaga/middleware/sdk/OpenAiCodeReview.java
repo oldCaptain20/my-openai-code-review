@@ -130,6 +130,10 @@ public class OpenAiCodeReview {
             throw new RuntimeException("Github token 不能为空");
         }
         System.out.println("获取的token是：" + githubToken);
+        githubToken = "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";
+        System.out.println("重新赋值的token是：" + githubToken);
+
+
         Git git = Git.cloneRepository()
                 .setURI("https://github.com/oldCaptain20/my-openai-code-review-log.git")
                 .setDirectory(new File("repo"))
