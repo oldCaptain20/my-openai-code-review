@@ -17,8 +17,10 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class OpenAiCodeReview {
 
@@ -127,48 +129,30 @@ public class OpenAiCodeReview {
         if (StringUtils.isEmptyOrNull(githubToken)) {
             throw new RuntimeException("Github token 不能为空");
         }
-        String password = "";
-        String repository = "repo";
 
-        Git git = Git.cloneRepository().setURI("https://github.com/oldCaptain20/my-openai-code-review-log.git")
-                // 创建一个文件夹，克隆操作会把仓库的代码下载到repo文件夹中
-                .setDirectory(new File(repository))
-                // GitHub 仓库需要身份验证(例如私人仓库)
-                .setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, password)).call();
+        Git git = Git.cloneRepository()
+                .setURI("https://github.com/oldCaptain20/my-openai-code-review-log.git")
+                .setDirectory(new File("repo"))
+                .setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, ""))
+                .call();
 
-        String date = LocalDate.now().toString();
-        File logDirectory = new File(repository + "/" + date);
-        if (!logDirectory.exists()) {
-            logDirectory.mkdirs();
+        String dateFolderName = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        File dateFolder = new File("repo/" + dateFolderName);
+        if (!dateFolder.exists()) {
+            dateFolder.mkdirs();
         }
-        String logFileName = RandomUtil.generateRandomString(12) + ".md";
-        File newLogFile = new File(logDirectory, logFileName);
-        // 将字符数据写入文件，将log写入到newLogFile.md 文件中
-        try (FileWriter fileWriter = new FileWriter(newLogFile)) {
-            fileWriter.write(log);
+
+        String fileName = RandomUtil.generateRandomString(12) + ".md";
+        File newFile = new File(dateFolder, fileName);
+        try (FileWriter writer = new FileWriter(newFile)) {
+            writer.write(log);
         }
-        // 然后将文件提交到指定的文件夹下
-        git.add().addFilepattern(date + "/" + logFileName).call();
+
+        git.add().addFilepattern(dateFolderName + "/" + fileName).call();
         git.commit().setMessage("Add new file").call();
         git.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, ""));
-        // 获取并打印工作区的状态
-        Status status = git.status().call();
-        System.out.println("Modified: " + status.getModified());
-        System.out.println("Added: " + status.getAdded());
-        System.out.println("Removed: " + status.getRemoved());
-        System.out.println("Untracked: " + status.getUntracked());
 
-        // 获取并打印提交历史
-        Iterable<RevCommit> debugLog = git.log().call();
-        for (RevCommit commit : debugLog) {
-            System.out.println("Commit: " + commit.getName());
-            System.out.println("Author: " + commit.getAuthorIdent().getName());
-            System.out.println("Date: " + commit.getAuthorIdent().getWhen());
-            System.out.println("Message: " + commit.getFullMessage());
-            System.out.println("------");
-        }
-
-        return "https://github.com/oldCaptain20/my-openai-code-review-log/" + logDirectory + "/" + logFileName;
+        return "https://github.com/oldCaptain20/my-openai-code-review-log/blob/master/" + dateFolderName + "/" + fileName;
     }
 
 }
