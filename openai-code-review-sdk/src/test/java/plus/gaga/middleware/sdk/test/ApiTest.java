@@ -2,14 +2,16 @@ package plus.gaga.middleware.sdk.test;
 
 
 import com.alibaba.fastjson2.JSON;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.TransportConfigCallback;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.transport.HttpTransport;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.junit.Test;
 import plus.gaga.middleware.sdk.infrustracture.openai.dto.ChatCompletionSyncResponseDTO;
 import plus.gaga.middleware.sdk.type.utils.BearerTokenUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -81,5 +83,18 @@ public class ApiTest {
         ChatCompletionSyncResponseDTO responseDTO = JSON.parseObject(json.toString(), ChatCompletionSyncResponseDTO.class);
         System.out.println(responseDTO.getChoices().get(0).getMessage().getContent());
     }
+
+    @Test
+    public void test_log_repository_write() throws GitAPIException {
+       String githubToken = "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";
+        Git git = Git.cloneRepository()
+                .setURI("https://github.com/oldCaptain20/my-openai-code-review-log.git")
+                .setDirectory(new File("repo"))
+                .setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, ""))
+                .call();
+        System.out.println("克隆代码");
+
+    }
+
 
 }
