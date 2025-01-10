@@ -27,8 +27,8 @@ public class OpenAiCodeReview {
     public static void main(String[] args) throws Exception {
         System.out.println("\"测试执行\" === " + "测试执行");
 
-        String githubToken = "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";
-
+//        String githubToken = "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";
+        String githubToken = System.getenv("GITHUB_TOKEN");
         // 代码检出
         ProcessBuilder processBuilder = new ProcessBuilder("git", "diff", "HEAD~1", "HEAD");
         // 执行命令时的工作目录。new File(".") 表示当前目录
