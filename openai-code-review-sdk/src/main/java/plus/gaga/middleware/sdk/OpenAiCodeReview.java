@@ -148,7 +148,7 @@ public class OpenAiCodeReview {
         System.out.println("写入文件 " + newFile.getAbsoluteFile().length());
         git.add().addFilepattern(dateFolderName + "/" + fileName).call();
         git.commit().setMessage("Add new file").call();
-        git.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, "")).call();
+        git.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, ""));
         return "https://github.com/oldCaptain20/my-openai-code-review-log/blob/master/" + dateFolderName + "/" + fileName;
     }
 
