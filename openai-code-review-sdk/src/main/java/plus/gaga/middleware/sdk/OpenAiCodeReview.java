@@ -24,7 +24,8 @@ public class OpenAiCodeReview {
     public static void main(String[] args) throws Exception {
         System.out.println("\"测试执行\" === " + "测试执行");
 
-        String githubToken = System.getenv("GITHUB_TOKEN");
+//        String githubToken = System.getenv("GITHUB_TOKEN");
+        String githubToken = "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";
 
         // 代码检出
         ProcessBuilder processBuilder = new ProcessBuilder("git", "diff", "HEAD~1", "HEAD");
@@ -127,10 +128,6 @@ public class OpenAiCodeReview {
             throw new RuntimeException("Github token 不能为空");
         }
         System.out.println("获取的token是：" + githubToken);
-        githubToken = "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";
-        System.out.println("重新赋值的token是：" + githubToken);
-
-
         Git git = Git.cloneRepository()
                 .setURI("https://github.com/oldCaptain20/my-openai-code-review-log.git")
                 .setDirectory(new File("repo"))
@@ -152,7 +149,6 @@ public class OpenAiCodeReview {
         git.add().addFilepattern(dateFolderName + "/" + fileName).call();
         git.commit().setMessage("Add new file").call();
         git.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, ""));
-
         return "https://github.com/oldCaptain20/my-openai-code-review-log/blob/master/" + dateFolderName + "/" + fileName;
     }
 
