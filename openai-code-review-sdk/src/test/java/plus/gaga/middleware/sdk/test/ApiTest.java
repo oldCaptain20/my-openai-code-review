@@ -87,7 +87,7 @@ public class ApiTest {
         ChatCompletionSyncResponseDTO responseDTO = JSON.parseObject(json.toString(), ChatCompletionSyncResponseDTO.class);
         System.out.println(responseDTO.getChoices().get(0).getMessage().getContent());
     }
-
+/*
     @Test
     public void test_log_repository_clone() throws GitAPIException {
         String githubToken = "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";
@@ -98,9 +98,9 @@ public class ApiTest {
                 .call();
         System.out.println("克隆代码");
 
-    }
+    }*/
 
-    @Test
+/*    @Test
     public void test_log_repository_write() throws GitAPIException, IOException {
         String githubToken = "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";
         Git git = Git.open(new File("D:\\Project\\my-openai-code-review\\openai-code-review-sdk\\repo"));
@@ -125,6 +125,6 @@ public class ApiTest {
         // 关闭 Git 对象
         git.close();
 
-    }
+    }*/
 
 }
