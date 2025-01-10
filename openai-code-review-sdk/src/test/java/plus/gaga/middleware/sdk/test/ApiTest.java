@@ -3,8 +3,12 @@ package plus.gaga.middleware.sdk.test;
 
 import com.alibaba.fastjson2.JSON;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.internal.storage.file.FileRepository;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.HttpTransport;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.junit.Test;
@@ -85,8 +89,8 @@ public class ApiTest {
     }
 
     @Test
-    public void test_log_repository_write() throws GitAPIException {
-       String githubToken = "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";
+    public void test_log_repository_clone() throws GitAPIException {
+        String githubToken = "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";
         Git git = Git.cloneRepository()
                 .setURI("https://github.com/oldCaptain20/my-openai-code-review-log.git")
                 .setDirectory(new File("repo"))
@@ -96,5 +100,31 @@ public class ApiTest {
 
     }
 
+    @Test
+    public void test_log_repository_write() throws GitAPIException, IOException {
+        String githubToken = "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";
+        Git git = Git.open(new File("D:\\Project\\my-openai-code-review\\openai-code-review-sdk\\repo"));
+        // 获取 Git 对象
+
+        // 设置远程仓库 URL 和认证信息
+        String remoteName = "origin"; // 通常使用 "origin" 作为默认远程仓库名
+        String remoteURL = "https://github.com/oldCaptain20/my-openai-code-review-log.git"; // 远程仓库 URL
+        // 配置推送
+
+        git.add().addFilepattern(".").call();
+        git.commit().setMessage("Add new file 1").call();
+        git.push()
+                .setRemote(remoteName)
+                .setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, ""))
+                .setPushAll() // 推送所有分支
+                .call();
+
+        // 输出成功信息
+        System.out.println("Successfully pushed to remote repository: " + remoteURL);
+
+        // 关闭 Git 对象
+        git.close();
+
+    }
 
 }
