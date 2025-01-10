@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.JSON;
 import org.bouncycastle.pqc.crypto.newhope.NHOtherInfoGenerator;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PushCommand;
+import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
@@ -92,7 +93,6 @@ public class ApiTest {
         ChatCompletionSyncResponseDTO responseDTO = JSON.parseObject(json.toString(), ChatCompletionSyncResponseDTO.class);
         System.out.println(responseDTO.getChoices().get(0).getMessage().getContent());
     }
-/*
     @Test
     public void test_log_repository_clone() throws GitAPIException {
         String githubToken = "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";
@@ -103,20 +103,22 @@ public class ApiTest {
                 .call();
         System.out.println("克隆代码");
 
-    }*/
+    }
 
-/*    @Test
+    @Test
     public void test_log_repository_write() throws GitAPIException, IOException {
         String githubToken = "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";
-        Git git = Git.open(new File("D:\\Project\\my-openai-code-review\\openai-code-review-sdk\\repo"));
+        Git git = Git.open(new File("D:\\Project\\my-openai-code-review\\repo"));
         // 获取 Git 对象
 
         // 设置远程仓库 URL 和认证信息
         String remoteName = "origin"; // 通常使用 "origin" 作为默认远程仓库名
         String remoteURL = "https://github.com/oldCaptain20/my-openai-code-review-log.git"; // 远程仓库 URL
         // 配置推送
-
-        git.add().addFilepattern(".").call();
+        Status status = git.status().call();
+        System.out.println(status.getModified());
+        git.add().addFilepattern("D:\\Project\\my-openai-code-review\\repo"+"/").call();
+        System.out.println(status.getModified());
         git.commit().setMessage("Add new file 1").call();
         git.push()
                 .setRemote(remoteName)
@@ -130,7 +132,7 @@ public class ApiTest {
         // 关闭 Git 对象
         git.close();
 
-    }*/
+    }
 
     @Test
     public void test_my_directory() throws Exception {

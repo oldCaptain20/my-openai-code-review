@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.JSON;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.transport.PushResult;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.util.StringUtils;
 import plus.gaga.middleware.sdk.domain.model.Model;
@@ -27,8 +28,8 @@ public class OpenAiCodeReview {
     public static void main(String[] args) throws Exception {
         System.out.println("\"测试执行\" === " + "测试执行");
 
-//        String githubToken = "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";
-        String githubToken = System.getenv("GITHUB_TOKEN");
+        String githubToken = "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";
+//        String githubToken = System.getenv("GITHUB_TOKEN");
         // 代码检出
         ProcessBuilder processBuilder = new ProcessBuilder("git", "diff", "HEAD~1", "HEAD");
         // 执行命令时的工作目录。new File(".") 表示当前目录
@@ -146,10 +147,32 @@ public class OpenAiCodeReview {
         try (FileWriter writer = new FileWriter(newFile)) {
             writer.write(log);
         }
+        Status status = git.status().call();
+        System.out.println(status.getUntracked());
+        System.out.println(status.getModified());
+        git.add().addFilepattern(dateFolderName + "/").call();
+        git.commit().setMessage("Add new file 123456").call();
 
-        git.add().addFilepattern(dateFolderName + "/" + fileName).call();
-        git.commit().setMessage("Add new file").call();
-        git.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, ""));
+        // 推送更改到远程仓库
+        Iterable<PushResult> call = git.push()
+                .setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, ""))
+                .setDryRun(false)  // 设置为 false，以查看推送是否成功
+                .call();
+
+        // 输出推送结果
+        call.forEach(pushRefUpdate -> System.out.println(pushRefUpdate.getMessages()));
+
+        System.out.println("获取提交历史记录");
+        // 获取提交历史记录
+        Iterable<RevCommit> logs = git.log().call();
+        // 打印提交记录
+        for (RevCommit commit : logs) {
+            System.out.println("Commit: " + commit.getName());
+            System.out.println("Author: " + commit.getAuthorIdent().getName());
+            System.out.println("Date: " + commit.getAuthorIdent().getWhen());
+            System.out.println("Message: " + commit.getFullMessage());
+            System.out.println("----------------------------------------");
+        }
 
         return "https://github.com/oldCaptain20/my-openai-code-review-log/blob/master/" + dateFolderName + "/" + fileName;
 
