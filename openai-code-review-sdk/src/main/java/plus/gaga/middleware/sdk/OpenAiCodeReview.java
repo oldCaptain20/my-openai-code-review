@@ -3,6 +3,8 @@ package plus.gaga.middleware.sdk;
 
 import com.alibaba.fastjson2.JSON;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.Status;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.util.StringUtils;
 import plus.gaga.middleware.sdk.domain.model.Model;
@@ -15,16 +17,14 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class OpenAiCodeReview {
 
     public static void main(String[] args) throws Exception {
         System.out.println("\"测试执行\" === " + "测试执行");
 
-//        String githubToken = System.getenv("GITHUB_TOKEN");
         String githubToken = "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";
 
         // 代码检出
@@ -127,29 +127,33 @@ public class OpenAiCodeReview {
         if (StringUtils.isEmptyOrNull(githubToken)) {
             throw new RuntimeException("Github token 不能为空");
         }
-        System.out.println("获取的token是：" + githubToken);
-        Git git = Git.cloneRepository()
-                .setURI("https://github.com/oldCaptain20/my-openai-code-review-log.git")
-                .setDirectory(new File("repo"))
-                .setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, ""))
-                .call();
-        System.out.println("克隆代码");
-        String dateFolderName = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-        File dateFolder = new File("repo/" + dateFolderName);
-        if (!dateFolder.exists()) {
-            dateFolder.mkdirs();
+        String password = "";
+        String repository = "repo";
+
+        Git git = Git.cloneRepository().setURI("https://github.com/oldCaptain20/my-openai-code-review-log.git")
+                // 创建一个文件夹，克隆操作会把仓库的代码下载到repo文件夹中
+                .setDirectory(new File(repository))
+                // GitHub 仓库需要身份验证(例如私人仓库)
+                .setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, password)).call();
+
+        String date = LocalDate.now().toString();
+        File logDirectory = new File(repository + "/" + date);
+        if (!logDirectory.exists()) {
+            logDirectory.mkdirs();
         }
-        System.out.println("创建文件夹 " + dateFolder.exists());
-        String fileName = RandomUtil.generateRandomString(12) + ".md";
-        File newFile = new File(dateFolder, fileName);
-        try (FileWriter writer = new FileWriter(newFile)) {
-            writer.write(log);
+        String logFileName = RandomUtil.generateRandomString(12) + ".md";
+        File newLogFile = new File(logDirectory, logFileName);
+        // 将字符数据写入文件，将log写入到newLogFile.md 文件中
+        try (FileWriter fileWriter = new FileWriter(newLogFile)) {
+            fileWriter.write(log);
         }
-        System.out.println("写入文件 " + newFile.getAbsoluteFile().length());
-        git.add().addFilepattern(dateFolderName + "/" + fileName).call();
+        // 然后将文件提交到指定的文件夹下
+        git.add().addFilepattern(date + "/" + logFileName).call();
         git.commit().setMessage("Add new file").call();
         git.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, ""));
-        return "https://github.com/oldCaptain20/my-openai-code-review-log/blob/master/" + dateFolderName + "/" + fileName;
+
+        return "https://github.com/oldCaptain20/my-openai-code-review-log/blob/master/" + logDirectory + "/" + newLogFile;
+
     }
 
 }
