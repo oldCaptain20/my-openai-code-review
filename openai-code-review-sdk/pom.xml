@@ -75,8 +75,6 @@
             <version>5.3.0.201903130848-r</version>
         </dependency>
 
-
-
     </dependencies>
 
     <build>
@@ -144,9 +142,9 @@
                             <include>com.fasterxml.jackson.core:jackson-core:</include>
                             <include>com.fasterxml.jackson.core:jackson-databind:</include>
                             <include>com.fasterxml.jackson.core:jackson-annotations:</include>
-                            <include>org.eclipse.jgit:org.eclipse.jgit:</include>
+
                         </includes>
-                    </artifactSet>
+                     </artifactSet>
                 </configuration>
             </plugin>
         </plugins>
