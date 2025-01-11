@@ -25,7 +25,8 @@ import java.util.Date;
 
 public class OpenAiCodeReview {
 
-    public static void main(String[] args) throws Exception {
+
+    public static void main(String[] args) {
         System.out.println("\"测试执行\" === " + "测试执行");
 
         String githubToken = System.getenv("GITHUB_TOKEN");
@@ -33,26 +34,40 @@ public class OpenAiCodeReview {
         ProcessBuilder processBuilder = new ProcessBuilder("git", "diff", "HEAD~1", "HEAD");
         // 执行命令时的工作目录。new File(".") 表示当前目录
         processBuilder.directory(new File("."));
-
         // 读取命令输出
-        Process process = processBuilder.start();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        StringBuilder diffCode = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            diffCode.append(line);
-        }
-        int exitCode = process.waitFor();
-        System.out.println("Exited with code: " + exitCode);
-        System.out.println("待评审代码\n" + diffCode);
-        String log = codeReview(diffCode.toString());
-        System.out.println("评审结果：\n" + log);
+        Process process = null;
+        try {
+            process = processBuilder.start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            StringBuilder diffCode = new StringBuilder();
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                diffCode.append(line);
+            }
+            int exitCode = process.waitFor();
+            System.out.println("代码diff完毕 状态码 Exited with code:" + exitCode);
+            System.out.println("diff code：" + diffCode.substring(0,20)+" 等等...");
 
-        // 写入日志库
-        String writeLog = writeLog(log, githubToken);
-        System.out.println("写入日志库URL\n" + writeLog);
+            System.out.println("2. chatglm 代码评审");
+            String log = codeReview(diffCode.toString());
+
+            System.out.println("3. 写入日志仓库");
+            System.out.println("code review：\n" + log.substring(0,20)+" 等等...");
+            String url = writeLog(log, githubToken);
+            System.out.println("写入日志仓库完毕\n");
+            System.out.println(url);
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
 
     }
+
 
     /**
      * 代码审查
