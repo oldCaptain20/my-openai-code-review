@@ -53,9 +53,9 @@ public class OpenAiCodeReview {
 
             System.out.println("3. 写入日志仓库");
             System.out.println("code review：\n" + log.substring(0,20)+" 等等...");
-            String url = writeLog(log, githubToken);
-            System.out.println("写入日志仓库完毕\n");
-            System.out.println(url);
+//            String url = writeLog(log, githubToken);
+//            System.out.println("写入日志仓库完毕\n");
+//            System.out.println(url);
 
         } catch (IOException ex) {
             ex.printStackTrace();
