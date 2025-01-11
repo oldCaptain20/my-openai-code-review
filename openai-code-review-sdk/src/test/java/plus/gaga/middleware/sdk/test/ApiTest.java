@@ -2,29 +2,15 @@ package plus.gaga.middleware.sdk.test;
 
 
 import com.alibaba.fastjson2.JSON;
-import org.bouncycastle.pqc.crypto.newhope.NHOtherInfoGenerator;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.PushCommand;
-import org.eclipse.jgit.api.Status;
-import org.eclipse.jgit.api.TransportConfigCallback;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.internal.storage.file.FileRepository;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.eclipse.jgit.transport.HttpTransport;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+
 import org.junit.Test;
 import plus.gaga.middleware.sdk.infrustracture.openai.dto.ChatCompletionSyncResponseDTO;
 import plus.gaga.middleware.sdk.type.utils.BearerTokenUtils;
-import plus.gaga.middleware.sdk.type.utils.RandomUtil;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.Date;
 
 public class ApiTest {
 
@@ -86,7 +72,6 @@ public class ApiTest {
 
 
     }
-
 
 
 }
