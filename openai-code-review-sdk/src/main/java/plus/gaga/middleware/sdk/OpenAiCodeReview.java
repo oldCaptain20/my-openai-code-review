@@ -53,9 +53,9 @@ public class OpenAiCodeReview {
 
             System.out.println("3. 写入日志仓库");
             System.out.println("code review：\n" + log.substring(0,20)+" 等等...");
-//            String url = writeLog(log, githubToken);
-//            System.out.println("写入日志仓库完毕\n");
-//            System.out.println(url);
+            String url = writeLog(log, githubToken);
+            System.out.println("写入日志仓库完毕\n");
+            System.out.println(url);
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -165,7 +165,7 @@ public class OpenAiCodeReview {
         System.out.println(status.getUntracked());
         System.out.println(status.getModified());
         git.add().addFilepattern(dateFolderName + "/").call();
-        git.commit().setMessage("Add new file 123456").call();
+        git.commit().setMessage("Add new file  ").call();
 
         // 推送更改到远程仓库
         Iterable<PushResult> call = git.push()
