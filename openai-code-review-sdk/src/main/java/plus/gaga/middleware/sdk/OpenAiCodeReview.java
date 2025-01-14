@@ -56,8 +56,8 @@ public class OpenAiCodeReview {
         logger.info("openai-code-review start!");
 
         GitCommand gitCommand = new GitCommand(
-                getEnv("GITHUB_REVIEW_LOG_URI"),
-                getEnv("GITHUB_TOKEN"),
+                getEnv("CODE_REVIEW_LOG_URI"),
+                getEnv("CODE_TOKEN"),
                 getEnv("COMMIT_PROJECT"),
                 getEnv("COMMIT_BRANCH"),
                 getEnv("COMMIT_AUTHOR"),
