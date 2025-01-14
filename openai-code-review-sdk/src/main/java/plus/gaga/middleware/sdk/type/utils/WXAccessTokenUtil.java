@@ -19,12 +19,12 @@ public class WXAccessTokenUtil {
     private static final String APPID = "wx53bdca8dd86dd1df";
     private static final String APPSECRET = "b2df97eb82d48828b7a9114bbc67f399";
 
-    public static String getAccessToken() {
+    public static String getAccessToken(String appid,String secret) {
         /*
         https请求方式: GET
         https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET
          */
-        String urlString = String.format(URL_TEMPLATE, GRANT_TYPE, APPID, APPSECRET);
+        String urlString = String.format(URL_TEMPLATE, GRANT_TYPE, appid, secret);
         try {
             URL url = new URL(urlString);
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();

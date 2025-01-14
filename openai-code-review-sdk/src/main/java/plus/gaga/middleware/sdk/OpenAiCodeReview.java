@@ -1,17 +1,24 @@
 package plus.gaga.middleware.sdk;
 
 
-
 import com.alibaba.fastjson2.JSON;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.PushResult;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import plus.gaga.middleware.sdk.domain.model.Model;
+import plus.gaga.middleware.sdk.domain.model.service.impl.OpenAiCodeReviewServiceImpl;
+import plus.gaga.middleware.sdk.infrustracture.git.GitCommand;
+import plus.gaga.middleware.sdk.infrustracture.openai.IOpenAI;
 import plus.gaga.middleware.sdk.infrustracture.openai.dto.ChatCompletionRequestDTO;
 import plus.gaga.middleware.sdk.infrustracture.openai.dto.ChatCompletionSyncResponseDTO;
+import plus.gaga.middleware.sdk.infrustracture.openai.impl.ChatGLM4Impl;
+import plus.gaga.middleware.sdk.infrustracture.wx.WeiXin;
 import plus.gaga.middleware.sdk.type.utils.BearerTokenUtils;
 import plus.gaga.middleware.sdk.type.utils.RandomUtil;
 
@@ -25,47 +32,62 @@ import java.util.Date;
 
 public class OpenAiCodeReview {
 
+    private static final Logger logger = LoggerFactory.getLogger(OpenAiCodeReview.class);
+
+    // Github的配置
+    private String githubReviewLogUri;
+    private String githubToken;
+    private String project;
+    private String branch;
+    private String author;
+    private String message;
+
+    // ChatGLM的配置
+    private String apiHost;
+    private String apiKey;
+
+    // 微信的配置
+    private String appid;
+    private String secret;
+    private String touser;
+    private String templateId;
 
     public static void main(String[] args) {
-        System.out.println("\"测试执行\" === " + "测试执行");
+        logger.info("openai-code-review start!");
 
-        String githubToken = System.getenv("GITHUB_TOKEN");
-        // 代码检出
-        ProcessBuilder processBuilder = new ProcessBuilder("git", "diff", "HEAD~1", "HEAD");
-        // 执行命令时的工作目录。new File(".") 表示当前目录
-        processBuilder.directory(new File("."));
-        // 读取命令输出
-        Process process = null;
-        try {
-            process = processBuilder.start();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            StringBuilder diffCode = new StringBuilder();
-            String line = "";
-            while ((line = reader.readLine()) != null) {
-                diffCode.append(line);
-            }
-            int exitCode = process.waitFor();
-            System.out.println("代码diff完毕 状态码 Exited with code:" + exitCode);
-            System.out.println("diff code：" + diffCode.substring(0,20)+" 等等...");
+        GitCommand gitCommand = new GitCommand(
+                getEnv("GITHUB_REVIEW_LOG_URI"),
+                getEnv("GITHUB_TOKEN"),
+                getEnv("COMMIT_PROJECT"),
+                getEnv("COMMIT_BRANCH"),
+                getEnv("COMMIT_AUTHOR"),
+                getEnv("COMMIT_MESSAGE")
+        );
+        IOpenAI openAI = new ChatGLM4Impl(
+                getEnv("CHATGLM_APIHOST"),
+                getEnv("CHATGLM_APIKEY")
+        );
+        WeiXin weiXin = new WeiXin(
+                getEnv("WEIXIN_APPID"),
+                getEnv("WEIXIN_SECRET"),
+                getEnv("WEIXIN_TOUSER"),
+                getEnv("WEIXIN_TEMPLATE_ID")
+        );
 
-            System.out.println("2. chatglm 代码评审");
-            String log = codeReview(diffCode.toString());
+        OpenAiCodeReviewServiceImpl service = new OpenAiCodeReviewServiceImpl(gitCommand, openAI, weiXin);
+        service.exec();
 
-            System.out.println("3. 写入日志仓库");
-            System.out.println("code review：\n" + log.substring(0,20)+" 等等...");
-            String url = writeLog(log, githubToken);
-            System.out.println("写入日志仓库完毕\n");
-            System.out.println(url);
+        logger.info("openai-code-review done!");
 
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        } catch (Exception ex) {
-            ex.printStackTrace();
+
+    }
+
+    private static String getEnv(String key) {
+        String value = System.getenv(key);
+        if (null == value || value.isEmpty()) {
+            throw new RuntimeException("value is null");
         }
-
-
+        return value;
     }
 
 
@@ -144,11 +166,7 @@ public class OpenAiCodeReview {
         if (StringUtils.isEmptyOrNull(githubToken)) {
             throw new RuntimeException("Github token 不能为空");
         }
-        Git git = Git.cloneRepository()
-                .setURI("https://github.com/oldCaptain20/my-openai-code-review-log.git")
-                .setDirectory(new File("repo"))
-                .setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, ""))
-                .call();
+        Git git = Git.cloneRepository().setURI("https://github.com/oldCaptain20/my-openai-code-review-log.git").setDirectory(new File("repo")).setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, "")).call();
 
         String dateFolderName = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         File dateFolder = new File("repo/" + dateFolderName);
@@ -168,9 +186,7 @@ public class OpenAiCodeReview {
         git.commit().setMessage("Add new file  ").call();
 
         // 推送更改到远程仓库
-        Iterable<PushResult> call = git.push()
-                .setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, ""))
-                .setDryRun(false)  // 设置为 false，以查看推送是否成功
+        Iterable<PushResult> call = git.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubToken, "")).setDryRun(false)  // 设置为 false，以查看推送是否成功
                 .call();
 
         // 输出推送结果

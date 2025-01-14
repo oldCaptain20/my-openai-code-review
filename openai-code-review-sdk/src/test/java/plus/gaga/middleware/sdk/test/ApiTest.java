@@ -35,7 +35,7 @@ public class ApiTest {
     private static void sendPostRequest(String jsonBody) {
         try {
 
-            String url = String.format("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=%s", WXAccessTokenUtil.getAccessToken());
+            String url = String.format("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=%s", WXAccessTokenUtil.getAccessToken("",""));
             HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
             httpURLConnection.setRequestMethod("POST");
             // 必须设置为true 不然不能写入到请求体中
@@ -113,7 +113,7 @@ public class ApiTest {
 
     @Test
     public void test_wx_get_access_token() {
-        String accessToken = WXAccessTokenUtil.getAccessToken();
+        String accessToken = WXAccessTokenUtil.getAccessToken("","");
         System.out.println("accessToken = " + accessToken);
         Message message = new Message();
         message.put("repo_name", "OpenAi 代码review");
