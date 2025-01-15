@@ -27,13 +27,16 @@ public abstract class AbstractOpenAiCodeReviewService implements IOpenAiCodeRevi
     @Override
     public void exec() {
         try {
-            // 1、获取提交代码的差异
+            logger.info("1、获取提交代码的差异");
             String diffCode = getDiffCode();
-            // 2、交给ai评审代码
+
+            logger.info("2、交给ai评审代码");
             String recommend = openAiCodeReview(diffCode);
-            // 3、记录评审结果，返回日志地址
+
+            logger.info("3、记录评审结果，返回日志地址");
             String logUrl = recordCodeView(recommend);
-            // 4、发送消息通知：日志地址，通知内容
+
+            logger.info("4、发送消息通知：日志地址，通知内容");
             pushMessage(logUrl);
         } catch (Exception e) {
             logger.error("openai-code-review error", e);

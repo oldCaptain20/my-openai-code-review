@@ -72,7 +72,7 @@ public class GitCommand {
     public String diff() throws IOException, InterruptedException {
         // 获取最近一个提交版本的 hash值
         ProcessBuilder processBuilder = new ProcessBuilder("git", "log", "-1", "--pretty=format:%H");
-        processBuilder.directory(new File("。"));
+        processBuilder.directory(new File("."));
         Process logResponse = processBuilder.start();
         // 解析结果
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(logResponse.getInputStream()));
