@@ -2,6 +2,8 @@ package plus.gaga.middleware.sdk.infrustracture.git;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.transport.PushResult;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,15 @@ public class GitCommand {
 
     private final String message;
 
+    public GitCommand(String githubReviewLogUri, String githubToken, String project, String branch, String author, String message) {
+        this.githubReviewLogUri = githubReviewLogUri;
+        this.githubToken = githubToken;
+        this.project = project;
+        this.branch = branch;
+        this.author = author;
+        this.message = message;
+    }
+
     public String getProject() {
         return project;
     }
@@ -51,15 +62,6 @@ public class GitCommand {
 
     public String getMessage() {
         return message;
-    }
-
-    public GitCommand(String githubReviewLogUri, String githubToken, String project, String branch, String author, String message) {
-        this.githubReviewLogUri = githubReviewLogUri;
-        this.githubToken = githubToken;
-        this.project = project;
-        this.branch = branch;
-        this.author = author;
-        this.message = message;
     }
 
     /**
@@ -100,7 +102,7 @@ public class GitCommand {
     }
 
     public String commitAndPush(String reviewLog) throws Exception {
-        logger.info("githubReviewLogUri{} ",githubReviewLogUri);
+        logger.info("githubReviewLogUri{} ", githubReviewLogUri);
         UsernamePasswordCredentialsProvider credentials = new UsernamePasswordCredentialsProvider(githubToken, "");
         Git git = Git.cloneRepository()
                 .setURI(githubReviewLogUri + ".git")
@@ -114,17 +116,29 @@ public class GitCommand {
             dateFolder.mkdirs();
         }
         // 日志文件名称 md文件由，项目-分支-作者-时间-5位流水号组成
-        String logFileName = project + "-" + branch + "-" + author + LocalDateTime.now() + RandomUtil.generateRandomString(5) + ".md";
+        String logFileName = project + "-" + branch + "-" + author.substring(0, 5) + "-" + LocalDateTime.now() + "-" + RandomUtil.generateRandomString(3) + ".md";
         // 在日期文件夹下创建一个新文件，将日志文件写入到新文件中
         File newFile = new File(dateFolder, logFileName);
-        try(FileWriter fileWriter=new FileWriter(newFile)){
+        try (FileWriter fileWriter = new FileWriter(newFile)) {
             fileWriter.write(reviewLog);
         }
 
         // 提交内容
         git.add().addFilepattern(dateFolder + "/").call();
         git.commit().setMessage("add code review new file" + logFileName).call();
-        git.push().setCredentialsProvider(credentials).call();
+        Iterable<PushResult> call = git.push().setCredentialsProvider(credentials).call();
+
+        Iterable<RevCommit> logs = git.log().call();
+
+        // 打印提交记录
+        for (RevCommit commit : logs) {
+            System.out.println("Commit: " + commit.getName());
+            System.out.println("Author: " + commit.getAuthorIdent().getName());
+            System.out.println("Date: " + commit.getAuthorIdent().getWhen());
+            System.out.println("Message: " + commit.getFullMessage());
+            System.out.println("----------------------------------------");
+        }
+
 
         logger.info("openai-code-review git commit and push done!{}", dateFolder);
         // 注意这里必须要写 /blob/master/ github规定的
