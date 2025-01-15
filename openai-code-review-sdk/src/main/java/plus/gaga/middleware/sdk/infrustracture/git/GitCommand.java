@@ -103,7 +103,7 @@ public class GitCommand {
         logger.info("githubReviewLogUri{} ",githubReviewLogUri);
         UsernamePasswordCredentialsProvider credentials = new UsernamePasswordCredentialsProvider(githubToken, "");
         Git git = Git.cloneRepository()
-                .setURI(githubReviewLogUri + "git")
+                .setURI(githubReviewLogUri + ".git")
                 .setDirectory(new File("repo"))
                 .setCredentialsProvider(credentials)
                 .call();
