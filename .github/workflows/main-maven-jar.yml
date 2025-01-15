@@ -71,4 +71,4 @@ jobs:
           WEIXIN_TEMPLATE_ID: ${{ secrets.WEIXIN_TEMPLATE_ID }}
           # OpenAi - ChatGLM 配置「https://open.bigmodel.cn/api/paas/v4/chat/completions」、「https://open.bigmodel.cn/usercenter/apikeys」
           CHATGLM_APIHOST: ${{ secrets.CHATGLM_APIHOST }}
-          CHATGLM_APIKEYSECRET: ${{ secrets.CHATGLM_APIKEYSECRET }}
+          CHATGLM_APIKEY: ${{ secrets.CHATGLM_APIKEY }}
