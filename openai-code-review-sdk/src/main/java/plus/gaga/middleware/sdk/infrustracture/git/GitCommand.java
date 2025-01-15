@@ -80,7 +80,8 @@ public class GitCommand {
         String lastCommitHash = bufferedReader.readLine();
         logger.info("上一个版本的hash：{}", lastCommitHash);
 
-        ProcessBuilder diffProcessBuilder = new ProcessBuilder("git", "diff", lastCommitHash + "^ ", lastCommitHash);
+        // 当前版本和上个版本的差异
+        ProcessBuilder diffProcessBuilder = new ProcessBuilder("git", "diff", lastCommitHash + "^", lastCommitHash);
         diffProcessBuilder.directory(new File("."));
         Process diffResponse = diffProcessBuilder.start();
         BufferedReader diffReader = new BufferedReader(new InputStreamReader(diffResponse.getInputStream()));
