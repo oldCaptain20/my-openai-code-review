@@ -13,6 +13,8 @@ import plus.gaga.middleware.sdk.type.utils.RandomUtil;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalField;
 
 
 public class GitCommand {
@@ -117,7 +119,9 @@ public class GitCommand {
             dateFolder.mkdirs();
         }
         // 日志文件名称 md文件由，项目-分支-作者-时间-5位流水号组成
-        String logFileName = project + "-" + branch + "-" + author.substring(0, 5) + "-" + LocalDateTime.now() + "-" + RandomUtil.generateRandomString(3) + ".md";
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH时-mm分-ss秒");
+        String logFileName = project + "-" + branch + "-" + author.substring(0, 5) + "-" + now.format(formatter) + "-" + RandomUtil.generateRandomString(3) + ".md";
         // 在日期文件夹下创建一个新文件，将日志文件写入到新文件中
         File newFile = new File(dateFolder, logFileName);
         try (FileWriter fileWriter = new FileWriter(newFile)) {
@@ -157,6 +161,5 @@ public class GitCommand {
         // 注意这里必须要写 /blob/master/ github规定的
         return githubReviewLogUri + "/blob/master/" + date + "/" + logFileName;
     }
-
 
 }
