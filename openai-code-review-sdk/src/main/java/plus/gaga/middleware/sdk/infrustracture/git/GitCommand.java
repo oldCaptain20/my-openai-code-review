@@ -1,6 +1,7 @@
 package plus.gaga.middleware.sdk.infrustracture.git;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.PushResult;
@@ -123,22 +124,34 @@ public class GitCommand {
             fileWriter.write(reviewLog);
         }
 
+        // 获取仓库状态
+        logger.info("提交前");
+        Status status = git.status().call();
+        // 打印仓库状态
+        System.out.println("Added files: " + status.getAdded());
+        System.out.println("Changed files: " + status.getChanged());
+        System.out.println("Missing files: " + status.getMissing());
+        System.out.println("Untracked files: " + status.getUntracked());
+        System.out.println("Removed files: " + status.getRemoved());
+        System.out.println("Conflicting files: " + status.getConflicting());
+        System.out.println("Uncommitted changes: " + status.getUncommittedChanges());
+
+
         // 提交内容
         git.add().addFilepattern(dateFolder + "/").call();
         git.commit().setMessage("add code review new file" + logFileName).call();
-        Iterable<PushResult> call = git.push().setCredentialsProvider(credentials).call();
+        git.push().setCredentialsProvider(credentials).call();
 
-        Iterable<RevCommit> logs = git.log().call();
-
-        // 打印提交记录
-        for (RevCommit commit : logs) {
-            System.out.println("Commit: " + commit.getName());
-            System.out.println("Author: " + commit.getAuthorIdent().getName());
-            System.out.println("Date: " + commit.getAuthorIdent().getWhen());
-            System.out.println("Message: " + commit.getFullMessage());
-            System.out.println("----------------------------------------");
-        }
-
+        logger.info("--------------->>提交后");
+        Status statusAfter = git.status().call();
+        // 打印仓库状态
+        System.out.println("Added files: " + statusAfter.getAdded());
+        System.out.println("Changed files: " + statusAfter.getChanged());
+        System.out.println("Missing files: " + statusAfter.getMissing());
+        System.out.println("Untracked files: " + statusAfter.getUntracked());
+        System.out.println("Removed files: " + statusAfter.getRemoved());
+        System.out.println("Conflicting files: " + statusAfter.getConflicting());
+        System.out.println("Uncommitted changes: " + statusAfter.getUncommittedChanges());
 
         logger.info("openai-code-review git commit and push done!{}", dateFolder);
         // 注意这里必须要写 /blob/master/ github规定的
