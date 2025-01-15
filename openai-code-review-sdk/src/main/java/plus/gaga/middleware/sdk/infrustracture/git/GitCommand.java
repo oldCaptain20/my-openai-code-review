@@ -100,6 +100,7 @@ public class GitCommand {
     }
 
     public String commitAndPush(String reviewLog) throws Exception {
+        logger.info("githubReviewLogUri{} ",githubReviewLogUri);
         UsernamePasswordCredentialsProvider credentials = new UsernamePasswordCredentialsProvider(githubToken, "");
         Git git = Git.cloneRepository()
                 .setURI(githubReviewLogUri + "git")
