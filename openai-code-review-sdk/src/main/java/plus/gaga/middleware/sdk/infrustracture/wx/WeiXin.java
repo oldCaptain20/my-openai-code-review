@@ -66,9 +66,9 @@ public class WeiXin {
             templateMessageDTO.setData(data);
             templateMessageDTO.setJumpTargeUrl(jumpTargetUrl);
             String accessToken = WXAccessTokenUtil.getAccessToken(appid, secret);
-            logger.info("微信的接口访问accessToken: {}", accessToken);
+            logger.error("微信的接口访问accessToken: {}", accessToken);
             String url = String.format(templateInvokeUrl, accessToken);
-            logger.info("url: {}", url);
+            logger.error("url: {}", url);
             HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
             httpURLConnection.setRequestMethod("POST");
             // 必须设置为true 不然不能写入到请求体中
