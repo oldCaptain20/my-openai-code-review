@@ -138,7 +138,7 @@ public class GitCommand {
 
 
         // 提交内容
-        git.add().addFilepattern(dateFolder + "/").call();
+        git.add().addFilepattern(date + "/").call();
         git.commit().setMessage("add code review new file" + logFileName).call();
         git.push().setCredentialsProvider(credentials).call();
 
