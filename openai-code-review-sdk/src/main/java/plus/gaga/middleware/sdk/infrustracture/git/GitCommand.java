@@ -13,6 +13,8 @@ import plus.gaga.middleware.sdk.type.utils.RandomUtil;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalField;
 
@@ -119,7 +121,7 @@ public class GitCommand {
             dateFolder.mkdirs();
         }
         // 日志文件名称 md文件由，项目-分支-作者-时间-5位流水号组成
-        LocalDateTime now = LocalDateTime.now();
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Shanghai"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH时-mm分-ss秒");
         String logFileName = project + "-" + branch + "-" + author.substring(0, 5) + "-" + now.format(formatter) + "-" + RandomUtil.generateRandomString(3) + ".md";
         // 在日期文件夹下创建一个新文件，将日志文件写入到新文件中
