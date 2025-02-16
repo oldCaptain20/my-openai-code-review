@@ -1,34 +1,14 @@
 package plus.gaga.middleware.sdk;
 
 
-import com.alibaba.fastjson2.JSON;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.Status;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.transport.PushResult;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.eclipse.jgit.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import plus.gaga.middleware.sdk.domain.model.Model;
 import plus.gaga.middleware.sdk.domain.model.service.impl.OpenAiCodeReviewServiceImpl;
 import plus.gaga.middleware.sdk.infrustracture.git.GitCommand;
 import plus.gaga.middleware.sdk.infrustracture.openai.IOpenAI;
-import plus.gaga.middleware.sdk.infrustracture.openai.dto.ChatCompletionRequestDTO;
-import plus.gaga.middleware.sdk.infrustracture.openai.dto.ChatCompletionSyncResponseDTO;
 import plus.gaga.middleware.sdk.infrustracture.openai.impl.ChatGLM4Impl;
 import plus.gaga.middleware.sdk.infrustracture.wx.WeiXin;
-import plus.gaga.middleware.sdk.type.utils.BearerTokenUtils;
-import plus.gaga.middleware.sdk.type.utils.RandomUtil;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 
 public class OpenAiCodeReview {
 
